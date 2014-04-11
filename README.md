@@ -54,7 +54,7 @@ The Kickflip Example .apk will be in `./app/build/apk`.
 ### Use the latest Release
 
 Stable releases of the Kickflip Android SDK are available from the [Maven Central Repository](http://search.maven.org/).
-The sample project here has our latest Maven release pre-added:
+This project's master branch has our latest Maven release pre-added:
 
 	// ./app/build.gradle
 	...
@@ -63,10 +63,13 @@ The sample project here has our latest Maven release pre-added:
 			compile 'io.kickflip:sdk:0.9.9'
 	}
 
+The dev branch is configured with the Kickflip Android SDK as a submodule dependency.
+
 ### Develop on the bleeding edge
 
 If you'd like to modify the sdk or just develop on the bleeding edge,
-add the kickflip-android-sdk to this project as a submodule.
+add the kickflip-android-sdk to this project as a submodule. This project's dev branch
+is configured in this manner.
 
 1. Clone the kickflip-android-sdk repo:
 

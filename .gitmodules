@@ -1,0 +1,3 @@
+[submodule "submodules/kickflip-android-sdk"]
+	path = submodules/kickflip-android-sdk
+	url = https://github.com/Kickflip/kickflip-android-sdk
