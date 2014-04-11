@@ -154,7 +154,10 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
      */
     private void persistStreams() {
         if (getActivity() != null) {
-            LocalPersistence.writeObjectToFile(getActivity(), mStreams.subList(0, 7), SERIALIZED_FILESTORE_NAME);
+            while (mStreams.size() > 7) {
+                mStreams.remove(mStreams.size()-1);
+            }
+            LocalPersistence.writeObjectToFile(getActivity(), mStreams, SERIALIZED_FILESTORE_NAME);
         }
     }
 
