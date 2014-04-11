@@ -3,7 +3,7 @@
 **note:** This is a pre-release preview. Consider nothing stable.
 
 This is an example implementation of the [kickflip-android-sdk](https://github.com/Kickflip/kickflip-android-sdk) that
-illustrates creating and browsing live, high definition HLS broadcasts.
+illustrates creating and browsing live high definition HLS broadcasts.
 
 
 ## Features
@@ -49,7 +49,7 @@ illustrates creating and browsing live, high definition HLS broadcasts.
 
 The Kickflip Example .apk will be in `./app/build/apk`.
 
-## Using the library
+## Using the Kickflip Android SDK
 
 ### Use the latest Release
 
@@ -60,17 +60,17 @@ The sample project here has our latest Maven release pre-added:
 	...
     dependencies {
 			...
-			compile 'io.kickflip:sdk:0.9'
+			compile 'io.kickflip:sdk:0.9.9'
 	}
 
 ### Develop on the bleeding edge
 
-If you'd instead like to modify the sdk or develop on the bleeding edge,
+If you'd like to modify the sdk or just develop on the bleeding edge,
 add the kickflip-android-sdk to this project as a submodule.
 
 1. Clone the kickflip-android-sdk repo:
 
-		$ git submodule add https://github.com/Kickflip/kickflip-android-sdk ./submodules
+		$ git submodule add https://github.com/Kickflip/kickflip-android-sdk ./submodules/kickflip-android-sdk/
 
 2. Add the sdk to your top-level `settings.gradle`:
 
@@ -85,7 +85,7 @@ add the kickflip-android-sdk to this project as a submodule.
 		dependencies {
 				...
 				//compile 'io.kickflip:sdk:0.9'
-				compile ':submodules:kickflip-android-sdk:sdk'
+				compile project(':submodules:kickflip-android-sdk:sdk')
 		}
 
 ## License
