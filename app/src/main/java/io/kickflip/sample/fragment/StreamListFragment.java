@@ -123,14 +123,14 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     @Override
     public void onStart() {
         super.onStart();
-        //loadPersistedStreams();
+        loadPersistedStreams();
         getStreams();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //persistStreams();
+        persistStreams();
     }
 
 
