@@ -60,7 +60,7 @@ This project's master branch has a dependency on our latest Maven Central releas
 	...
     dependencies {
 			...
-			compile 'io.kickflip:sdk:0.9.9'
+			compile 'io.kickflip:sdk:0.9.10'
 	}
 
 ### Develop on the bleeding edge (dev branch)
