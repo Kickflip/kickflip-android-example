@@ -5,8 +5,9 @@
         <item name="android:windowBackground">@color/window_bg</item>
         <item name="android:actionBarStyle">@style/KFActionBar</item>
         <item name="android:actionMenuTextColor">@color/kickflip_white</item>
-        <item name="android:windowActionBarOverlay">false</item>
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="KFActionBar" parent="@android:style/Widget.Holo.ActionBar">

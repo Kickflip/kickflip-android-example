@@ -1,9 +1,9 @@
 # kickflip-android-example
 
-**note:** This is a pre-release preview. Consider nothing stable.
+![kickflip app screenshot](http://i.imgur.com/qcml2eQ.jpg)
 
 This is an example implementation of the [kickflip-android-sdk](https://github.com/Kickflip/kickflip-android-sdk) that
-illustrates creating and browsing live high definition HLS broadcasts.
+illustrates easy live, high definition HLS broadcasts. Also check out our slick [iOS example project](https://github.com/Kickflip/kickflip-ios-example)!
 
 
 ## Features

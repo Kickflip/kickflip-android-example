@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+
 import java.io.File;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
@@ -74,6 +76,16 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
                         .commit();
             }
         }
+        tintStatusBar();
+    }
+
+    private void tintStatusBar() {
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // enable navigation bar tint
+        tintManager.setNavigationBarTintEnabled(false);
+        tintManager.setTintColor(getResources().getColor(R.color.kickflip_green));
     }
 
     @Override
