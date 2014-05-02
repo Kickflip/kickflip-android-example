@@ -28,6 +28,7 @@ import io.kickflip.sdk.api.KickflipCallback;
 import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.api.json.StreamList;
+import io.kickflip.sdk.exception.KickflipException;
 
 /**
  * A fragment representing a list of Items.
@@ -65,7 +66,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
                 @Override
                 public void onSuccess(Response response) {
                     if (getActivity() != null) {
-                        if (mKickflip.userOwnsStream(stream)) {
+                        if (mKickflip.activeUserOwnsStream(stream)) {
                             mAdapter.remove(stream);
                             mAdapter.notifyDataSetChanged();
                         } else {
@@ -75,10 +76,10 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
                 }
 
                 @Override
-                public void onError(Object response) {}
+                public void onError(KickflipException error) {}
             };
 
-            if (mKickflip.userOwnsStream(stream)) {
+            if (mKickflip.activeUserOwnsStream(stream)) {
                 stream.setDeleted(true);
                 mKickflip.setStreamInfo(stream, cb);
             } else {
@@ -108,13 +109,14 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
             @Override
             public void onSuccess(Response response) {
                 if (mAdapter != null) {
-                    mAdapter.setUserName(mKickflip.getCachedUser().getName());
+                    mAdapter.setUserName(mKickflip.getActiveUser().getName());
                 }
+                getStreams();
                 // Update profile display when we add that
             }
 
             @Override
-            public void onError(Object response) {
+            public void onError(KickflipException error) {
                 showNetworkError();
             }
         });
@@ -213,8 +215,9 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     }
 
     private void getStreams() {
+        if (mKickflip.getActiveUser() == null || mRefreshing) return;
         mRefreshing = true;
-        mKickflip.getBroadcastsByKeyword(mKickflip.getCachedUser(), null, new KickflipCallback() {
+        mKickflip.getStreamsByKeyword(null, new KickflipCallback() {
             @Override
             public void onSuccess(Response response) {
                 if (VERBOSE) Log.i("API", "request succeeded " + response);
@@ -226,8 +229,8 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
             }
 
             @Override
-            public void onError(Object response) {
-                if (VERBOSE) Log.i("API", "request failed " + response);
+            public void onError(KickflipException error) {
+                if (VERBOSE) Log.i("API", "request failed " + error.getMessage());
                 if (getActivity() != null) {
                     showNetworkError();
                 }
@@ -243,8 +246,8 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
             mAdapter = new StreamAdapter(getActivity(), mStreams, mStreamActionListener);
             mAdapter.setNotifyOnChange(false);
             mListView.setAdapter(mAdapter);
-            if (mKickflip.credentialsAcquired()) {
-                mAdapter.setUserName(mKickflip.getCachedUser().getName());
+            if (mKickflip.getActiveUser() != null) {
+                mAdapter.setUserName(mKickflip.getActiveUser().getName());
             }
         }
     }

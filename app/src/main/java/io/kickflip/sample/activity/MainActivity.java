@@ -19,8 +19,10 @@ import io.kickflip.sample.Util;
 import io.kickflip.sample.fragment.MainFragment;
 import io.kickflip.sample.fragment.StreamListFragment;
 import io.kickflip.sdk.Kickflip;
+import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.av.BroadcastListener;
 import io.kickflip.sdk.av.SessionConfig;
+import io.kickflip.sdk.exception.KickflipException;
 import io.kickflip.sdk.fragment.BroadcastFragment;
 
 import static io.kickflip.sdk.Kickflip.isKickflipUrl;
@@ -35,8 +37,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         }
 
         @Override
-        public void onBroadcastLive(String watchUrl) {
-            Log.i(TAG, "onBroadcastLive @ " + watchUrl);
+        public void onBroadcastLive(Stream stream) {
+            Log.i(TAG, "onBroadcastLive @ " + stream.getKickflipUrl());
         }
 
         @Override
@@ -53,8 +55,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         }
 
         @Override
-        public void onBroadcastError() {
-            Log.i(TAG, "onBroadcastError");
+        public void onBroadcastError(KickflipException error) {
+            Log.i(TAG, "onBroadcastError " + error.getMessage());
         }
     };
     // By default, Kickflip stores video in a "Kickflip" directory on external storage
