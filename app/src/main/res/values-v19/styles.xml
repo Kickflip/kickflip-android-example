@@ -2,7 +2,7 @@
 
     <!-- v19 application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:windowBackground">@color/window_bg</item>
+        <item name="android:windowBackground">@color/kickflip_green</item>
         <item name="android:actionBarStyle">@style/KFActionBar</item>
         <item name="android:actionMenuTextColor">@color/kickflip_white</item>
         <item name="android:windowActionBarOverlay">true</item>

@@ -9,12 +9,15 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import io.kickflip.sdk.av.SessionConfig;
+
 /**
  * Created by David Brodsky on 3/20/14.
  */
 public class Util {
     //"04/03/2014 23:41:37",
-    private static SimpleDateFormat mMachineSdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.US);;
+    private static SimpleDateFormat mMachineSdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.US);
+    ;
     private static SimpleDateFormat mHumanSdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
 
     static {
@@ -38,5 +41,21 @@ public class Util {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * Create a {@link io.kickflip.sdk.av.SessionConfig}
+     *
+     * @param outputPath the desired recording output path
+     * @return the resulting SessionConfig
+     */
+    public static SessionConfig create720pSessionConfig(String outputPath) {
+        SessionConfig config = new SessionConfig.Builder(outputPath)
+                .withTitle(Util.getHumanDateString())
+                .withPrivateVisibility(false)
+                .withLocation(true)
+                .withVideoResolution(1280, 720)
+                .build();
+        return config;
     }
 }

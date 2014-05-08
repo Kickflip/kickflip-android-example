@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.kickflip.sample" >
+    package="io.kickflip.sample">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -17,11 +17,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name="io.kickflip.sample.activity.MainActivity"
             android:label="@string/kickflip"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,26 +29,39 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:scheme="kickflip"/>
-                <data android:host="www.kickflip.io"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="kickflip" />
+                <data android:host="www.kickflip.io" />
                 <data android:host="kickflip.io" />
             </intent-filter>
 
         </activity>
         <activity
-            android:name="io.kickflip.sdk.activity.BroadcastActivity"
+            android:name=".activity.CameraActivity"
             android:keepScreenOn="true"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
         </activity>
         <activity
+            android:name="io.kickflip.sdk.activity.BroadcastActivity"
+            android:keepScreenOn="true"
+            android:screenOrientation="landscape"/>
+        <activity
             android:name="io.kickflip.sdk.activity.MediaPlayerActivity"
-            android:screenOrientation="landscape" >
-        </activity>
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

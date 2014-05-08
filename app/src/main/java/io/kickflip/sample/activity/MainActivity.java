@@ -148,14 +148,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
     }
 
     private void configureNewBroadcast() {
-        SessionConfig config = new SessionConfig.Builder(mRecordingOutputPath)
-                .withTitle(Util.getHumanDateString())
-                .withDescription("Example Description")
-                .withExtraInfo("{'foo': 'bar'}")
-                .withPrivateVisibility(false)
-                .withLocation(true)
-                .withVideoResolution(1280, 720)
-                .build();
+        // Should reset mRecordingOutputPath between recordings
+        SessionConfig config = Util.create720pSessionConfig(mRecordingOutputPath);
         Kickflip.setSessionConfig(config);
     }
 

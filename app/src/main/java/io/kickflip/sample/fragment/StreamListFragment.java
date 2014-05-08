@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.kickflip.sample.EndlessScrollListener;
 import io.kickflip.sample.LocalPersistence;
 import io.kickflip.sample.R;
 import io.kickflip.sample.SECRETS;
@@ -47,6 +48,9 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     private KickflipApiClient mKickflip;
     private List<Stream> mStreams;
     private boolean mRefreshing;
+
+    private int mCurrentPage = 1;
+    private static final int ITEMS_PER_PAGE = 10;
 
     /**
      * The fragment's ListView/GridView.
@@ -94,6 +98,14 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         }
     };
 
+    private EndlessScrollListener mEndlessScrollListener = new EndlessScrollListener() {
+        @Override
+        public void onLoadMore(int page, int totalItemsCount) {
+            Log.i(TAG, "Loading more streams");
+            getStreams(false);
+        }
+    };
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -111,7 +123,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
                 if (mAdapter != null) {
                     mAdapter.setUserName(mKickflip.getActiveUser().getName());
                 }
-                getStreams();
+                getStreams(true);
                 // Update profile display when we add that
             }
 
@@ -126,7 +138,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     public void onStart() {
         super.onStart();
         loadPersistedStreams();
-        getStreams();
+        getStreams(true);
     }
 
     @Override
@@ -143,7 +155,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         if (getActivity() != null) {
             Object streams = LocalPersistence.readObjectFromFile(getActivity(), SERIALIZED_FILESTORE_NAME);
             if (streams != null) {
-                refreshStreams((List<Stream>) streams);
+                displayStreams((List<Stream>) streams, false);
             }
         }
     }
@@ -170,6 +182,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView.setOnScrollListener(mEndlessScrollListener);
         mListView.setEmptyView(view.findViewById(android.R.id.empty));
         // Why does this selection remain if I long press, release
         // without activating onListItemClick?
@@ -214,18 +227,26 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         mListener.onStreamPlaybackRequested(stream.getStreamUrl());
     }
 
-    private void getStreams() {
+    /**
+     * Fetch Streams and display in ListView
+     *
+     * @param refresh whether this fetch is for a subsequent page
+     *                      or to refresh the first page
+     */
+    private void getStreams(final boolean refresh) {
         if (mKickflip.getActiveUser() == null || mRefreshing) return;
         mRefreshing = true;
-        mKickflip.getStreamsByKeyword(null, new KickflipCallback() {
+        if (refresh) mCurrentPage = 1;
+        mKickflip.getStreamsByKeyword(null, mCurrentPage, ITEMS_PER_PAGE, new KickflipCallback() {
             @Override
             public void onSuccess(Response response) {
                 if (VERBOSE) Log.i("API", "request succeeded " + response);
                 if (getActivity() != null) {
-                    refreshStreams(((StreamList) response).getStreams());
+                    displayStreams(((StreamList) response).getStreams(), !refresh);
                 }
                 mSwipeLayout.setRefreshing(false);
                 mRefreshing = false;
+                mCurrentPage++;
             }
 
             @Override
@@ -256,9 +277,15 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
      * Display the given List of {@link io.kickflip.sdk.api.json.Stream} Objects
      *
      * @param streams a List of {@link io.kickflip.sdk.api.json.Stream} Objects
+     * @param append whether to append the given streams to the current list
+     *               or use the given streams as the absolute dataset.
      */
-    private void refreshStreams(List<Stream> streams) {
-        mStreams = streams;
+    private void displayStreams(List<Stream> streams, boolean append) {
+        if (append) {
+            mStreams.addAll(streams);
+        } else {
+            mStreams = streams;
+        }
         Collections.sort(mStreams);
         mAdapter.refresh(mListView, mStreams);
         if (mStreams.size() == 0) {
@@ -296,7 +323,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     @Override
     public void onRefresh() {
         if (!mRefreshing) {
-            getStreams();
+            getStreams(true);
         }
 
     }
