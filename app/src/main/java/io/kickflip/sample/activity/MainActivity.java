@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+
 import java.io.File;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
@@ -17,8 +19,10 @@ import io.kickflip.sample.Util;
 import io.kickflip.sample.fragment.MainFragment;
 import io.kickflip.sample.fragment.StreamListFragment;
 import io.kickflip.sdk.Kickflip;
+import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.av.BroadcastListener;
 import io.kickflip.sdk.av.SessionConfig;
+import io.kickflip.sdk.exception.KickflipException;
 import io.kickflip.sdk.fragment.BroadcastFragment;
 
 import static io.kickflip.sdk.Kickflip.isKickflipUrl;
@@ -33,8 +37,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         }
 
         @Override
-        public void onBroadcastLive(String watchUrl) {
-            Log.i(TAG, "onBroadcastLive @ " + watchUrl);
+        public void onBroadcastLive(Stream stream) {
+            Log.i(TAG, "onBroadcastLive @ " + stream.getKickflipUrl());
         }
 
         @Override
@@ -51,8 +55,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         }
 
         @Override
-        public void onBroadcastError() {
-            Log.i(TAG, "onBroadcastError");
+        public void onBroadcastError(KickflipException error) {
+            Log.i(TAG, "onBroadcastError " + error.getMessage());
         }
     };
     // By default, Kickflip stores video in a "Kickflip" directory on external storage
@@ -74,6 +78,16 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
                         .commit();
             }
         }
+        tintStatusBar();
+    }
+
+    private void tintStatusBar() {
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // enable navigation bar tint
+        tintManager.setNavigationBarTintEnabled(false);
+        tintManager.setTintColor(getResources().getColor(R.color.kickflip_green));
     }
 
     @Override
@@ -134,14 +148,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
     }
 
     private void configureNewBroadcast() {
-        SessionConfig config = new SessionConfig.Builder(mRecordingOutputPath)
-                .withTitle(Util.getHumanDateString())
-                .withDescription("Example Description")
-                .withExtraInfo("{'foo': 'bar'}")
-                .withPrivateVisibility(false)
-                .withLocation(true)
-                .withVideoResolution(1280, 720)
-                .build();
+        // Should reset mRecordingOutputPath between recordings
+        SessionConfig config = Util.create720pSessionConfig(mRecordingOutputPath);
         Kickflip.setSessionConfig(config);
     }
 

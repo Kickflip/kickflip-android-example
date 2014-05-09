@@ -26,5 +26,6 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.squareup.picasso:picasso:2.2.0'
-    compile 'io.kickflip:sdk:0.9.10'
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+    compile 'io.kickflip:sdk:0.9.11'
 }

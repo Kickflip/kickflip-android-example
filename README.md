@@ -60,7 +60,7 @@ This project's master branch has a dependency on our latest Maven Central releas
 	...
     dependencies {
 			...
-			compile 'io.kickflip:sdk:0.9.10'
+			compile 'io.kickflip:sdk:0.9.11'
 	}
 
 ### Develop on the bleeding edge (dev branch)
@@ -85,7 +85,7 @@ is already configured in this manner.
 		...
 		dependencies {
 				...
-				//compile 'io.kickflip:sdk:0.9'
+				//compile 'io.kickflip:sdk:0.9.11'
 				compile project(':submodules:kickflip-android-sdk:sdk')
 		}
 

@@ -91,7 +91,7 @@ public class StreamAdapter extends ArrayAdapter<Stream> {
         } else {
             // A previously ended Stream
             holder.liveBannerView.setVisibility(View.GONE);
-            holder.rightTitleView.setText(String.format("%d:%02d",
+            holder.rightTitleView.setText(String.format("%dm %ds",
                     TimeUnit.SECONDS.toMinutes(streamLengthSec),
                     TimeUnit.SECONDS.toSeconds(streamLengthSec) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(streamLengthSec))
