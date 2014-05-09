@@ -60,7 +60,7 @@ This project's master branch has our latest Maven release pre-added:
 	...
     dependencies {
 			...
-			compile 'io.kickflip:sdk:0.9.9'
+			compile 'io.kickflip:sdk:0.9.11'
 	}
 
 The dev branch is configured with the Kickflip Android SDK as a submodule dependency.
@@ -87,7 +87,7 @@ is configured in this manner.
 		...
 		dependencies {
 				...
-				//compile 'io.kickflip:sdk:0.9'
+				//compile 'io.kickflip:sdk:0.9.11'
 				compile project(':submodules:kickflip-android-sdk:sdk')
 		}
 
