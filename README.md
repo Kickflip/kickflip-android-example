@@ -16,38 +16,57 @@ illustrates easy live, high definition HLS broadcasts. Also check out our slick 
 
 ### Set up Java, the Android SDK & Build-Tools
 
-1. [Download and install JDK 1.7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+1. [Download and install the latest JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 2. [Download and install the Android SDK](http://developer.android.com/sdk/)
-3. Run `/android-sdk/tools/android` to install the following packages:
+3. Run `path/to/android-sdk/tools/android` to install the following packages:
 
-![Installing packages from the Android SDK Manager](http://i.imgur.com/PuWsBEB.png)
+	+ Android SDK Tools 22.6.3
+	+ Android SDK Platform-tools 19.0.2
+	+ Android SDK Build-tools 19.1
+	+ Android 4.4.2 SDK Platform 3
+	+ Android Support Repository 5
+	+ Android Support Library 19.1
 
-**ProTip**: You should have the Android SDK root, along with the `/tools` and `/platform-tools` sub-directories added to your PATH.
 
-### Build
-
-1. Define the Android SDK location as `$ANDROID_HOME` in your environment.
+4. Define the Android SDK root directory as `$ANDROID_HOME` in your environment.
 
 		# ~/.bash_profile
 		# e.g If you're using Android Studio on Mac OS X:
 		export ANDROID_HOME=/Applications/Android\ Studio.app/sdk/
 
+**ProTip**: You should have the Android SDK root, along with the `/tools` and `/platform-tools` sub-directories added to your PATH.
 
+### SECRETS.java
 
-2. Create a file named `SECRETS.java` in `./app/src/main/java/io/kickflip/sample/`:
+After you [sign up](https://kickflip.io) for a Kickflip account, copy your API keys to `./app/src/main/java/io/kickflip/sample/SECRETS.java`:
 
+		$ touch ./app/src/main/java/io/kickflip/sample/SECRETS.java
+
+```java
 		package io.kickflip.sample;
 		public class SECRETS {
 		    public static final String CLIENT_KEY = "YourKickflipKey";
 		    public static final String CLIENT_SECRET = "YourKickflipSecret";
 		}
+```
 
 
-3. From this directory run:
+#### Building from the Command Line
+
+1. From this directory run:
 
 	    $ ./gradlew assembleDebug
 
-The Kickflip Example .apk will be in `./app/build/apk`.
+2. The Kickflip Example .apk will be in `./app/build/apk`. Install it!
+
+		$ adb install ./app/build/apk/app-debug-unaligned.apk
+		
+#### Building with Android Studio
+
+1. Select `Import Project` and point Android Studio to the root project directory.
+
+2. Hit the `Play` Icon or `control + R` to build and run on your attached Android device.
+
 
 ## Using the Kickflip Android SDK
 
