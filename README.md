@@ -68,48 +68,6 @@ After you [sign up](https://kickflip.io) for a Kickflip account, copy your API k
 2. Hit the `Play` Icon or `control + R` to build and run on your attached Android device.
 
 
-## Using the Kickflip Android SDK
-
-### Use the latest Release
-
-Stable releases of the Kickflip Android SDK are available from the [Maven Central Repository](http://search.maven.org/).
-This project's master branch has our latest Maven release pre-added:
-
-	// ./app/build.gradle
-	...
-    dependencies {
-			...
-			compile 'io.kickflip:sdk:0.9.11'
-	}
-
-The dev branch is configured with the Kickflip Android SDK as a submodule dependency.
-
-### Develop on the bleeding edge
-
-If you'd like to modify the sdk or just develop on the bleeding edge,
-add the kickflip-android-sdk to this project as a submodule. This project's dev branch
-is configured in this manner.
-
-1. Clone the kickflip-android-sdk repo:
-
-		$ git submodule add https://github.com/Kickflip/kickflip-android-sdk ./submodules/kickflip-android-sdk/
-
-2. Add the sdk to your top-level `settings.gradle`:
-
-		// settings.gradle
-		include ':app'
-		include ':submodules:kickflip-android-sdk:sdk'
-
-3. Add the sdk as a dependency to the sample module's `build.gradle`:
-
-		// ./app/build.gradle
-		...
-		dependencies {
-				...
-				//compile 'io.kickflip:sdk:0.9.11'
-				compile project(':submodules:kickflip-android-sdk:sdk')
-		}
-
 ## License
 
 Apache 2.0

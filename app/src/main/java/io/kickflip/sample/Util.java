@@ -6,6 +6,7 @@ import android.text.format.DateUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -51,12 +52,19 @@ public class Util {
      * @return the resulting SessionConfig
      */
     public static SessionConfig create720pSessionConfig(String outputPath) {
+        HashMap<String, String> extraData = new HashMap<>();
+        extraData.put("key", "value");
+
         SessionConfig config = new SessionConfig.Builder(outputPath)
                 .withTitle(Util.getHumanDateString())
+                .withDescription("A live stream!")
+                .withAdaptiveStreaming(true)
+                .withVideoResolution(1280, 720)
+                .withVideoBitrate(2 * 1000 * 1000)
+                .withAudioBitrate(192 * 1000)
+                .withExtraInfo(extraData)
                 .withPrivateVisibility(false)
                 .withLocation(true)
-                .withVideoResolution(1280, 720)
-                //.withVerticalVideoCorrection(true) /* Rotates and crops vertical video to fill screen */
                 .build();
         return config;
     }
