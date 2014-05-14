@@ -45,6 +45,7 @@ public class Util {
 
     /**
      * Create a {@link io.kickflip.sdk.av.SessionConfig}
+     * corresponding to a 720p video stream
      *
      * @param outputPath the desired recording output path
      * @return the resulting SessionConfig
@@ -55,6 +56,25 @@ public class Util {
                 .withPrivateVisibility(false)
                 .withLocation(true)
                 .withVideoResolution(1280, 720)
+                //.withVerticalVideoCorrection(true) /* Rotates and crops vertical video to fill screen */
+                .build();
+        return config;
+    }
+
+    /**
+     * Create a {@link io.kickflip.sdk.av.SessionConfig}
+     * corresponding to a 420p video stream
+     *
+     * @param outputPath the desired recording output path
+     * @return the resulting SessionConfig
+     */
+    public static SessionConfig create420pSessionConfig(String outputPath) {
+        SessionConfig config = new SessionConfig.Builder(outputPath)
+                .withTitle(Util.getHumanDateString())
+                .withVideoBitrate(1 * 1000 * 1000)
+                .withPrivateVisibility(false)
+                .withLocation(true)
+                .withVideoResolution(720, 480)
                 .build();
         return config;
     }
