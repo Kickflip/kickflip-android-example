@@ -1,6 +1,8 @@
 package io.kickflip.sample.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,6 +21,8 @@ import io.kickflip.sample.Util;
 import io.kickflip.sample.fragment.MainFragment;
 import io.kickflip.sample.fragment.StreamListFragment;
 import io.kickflip.sdk.Kickflip;
+import io.kickflip.sdk.api.KickflipCallback;
+import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.av.BroadcastListener;
 import io.kickflip.sdk.av.SessionConfig;
@@ -30,6 +34,9 @@ import static io.kickflip.sdk.Kickflip.isKickflipUrl;
 
 public class MainActivity extends Activity implements MainFragmentInteractionListener, StreamListFragment.StreamListFragmenListener {
     private static final String TAG = "MainActivity";
+
+    private boolean mKickflipReady = false;
+
     private BroadcastListener mBroadcastListener = new BroadcastListener() {
         @Override
         public void onBroadcastStart() {
@@ -69,7 +76,17 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         setContentView(R.layout.activity_main);
 
         // This must happen before any other Kickflip interactions
-        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET);
+        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback() {
+            @Override
+            public void onSuccess(Response response) {
+                mKickflipReady = true;
+            }
+
+            @Override
+            public void onError(KickflipException error) {
+
+            }
+        });
 
         if (!handleLaunchingIntent()) {
             if (savedInstanceState == null) {
@@ -100,7 +117,19 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_broadcast:
-                startBroadcastingActivity();
+                if (mKickflipReady) {
+                    startBroadcastingActivity();
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle(getString(R.string.dialog_title_not_ready))
+                            .setMessage(getString(R.string.dialog_msg_not_ready))
+                            .setPositiveButton(getString(R.string.dialog_ok), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -150,6 +179,7 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
     private void configureNewBroadcast() {
         // Should reset mRecordingOutputPath between recordings
         SessionConfig config = Util.create720pSessionConfig(mRecordingOutputPath);
+        //SessionConfig config = Util.create420pSessionConfig(mRecordingOutputPath);
         Kickflip.setSessionConfig(config);
     }
 

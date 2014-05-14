@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1"
 
     defaultConfig {
         minSdkVersion 18
@@ -27,5 +27,5 @@ dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.squareup.picasso:picasso:2.2.0'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    compile 'io.kickflip:sdk:0.9.11'
+    compile 'io.kickflip:sdk:1.0'
 }

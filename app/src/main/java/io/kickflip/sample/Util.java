@@ -6,6 +6,7 @@ import android.text.format.DateUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -45,16 +46,43 @@ public class Util {
 
     /**
      * Create a {@link io.kickflip.sdk.av.SessionConfig}
+     * corresponding to a 720p video stream
      *
      * @param outputPath the desired recording output path
      * @return the resulting SessionConfig
      */
     public static SessionConfig create720pSessionConfig(String outputPath) {
+        HashMap<String, String> extraData = new HashMap<>();
+        extraData.put("key", "value");
+
         SessionConfig config = new SessionConfig.Builder(outputPath)
                 .withTitle(Util.getHumanDateString())
+                .withDescription("A live stream!")
+                .withAdaptiveStreaming(true)
+                .withVideoResolution(1280, 720)
+                .withVideoBitrate(2 * 1000 * 1000)
+                .withAudioBitrate(192 * 1000)
+                .withExtraInfo(extraData)
                 .withPrivateVisibility(false)
                 .withLocation(true)
-                .withVideoResolution(1280, 720)
+                .build();
+        return config;
+    }
+
+    /**
+     * Create a {@link io.kickflip.sdk.av.SessionConfig}
+     * corresponding to a 420p video stream
+     *
+     * @param outputPath the desired recording output path
+     * @return the resulting SessionConfig
+     */
+    public static SessionConfig create420pSessionConfig(String outputPath) {
+        SessionConfig config = new SessionConfig.Builder(outputPath)
+                .withTitle(Util.getHumanDateString())
+                .withVideoBitrate(1 * 1000 * 1000)
+                .withPrivateVisibility(false)
+                .withLocation(true)
+                .withVideoResolution(720, 480)
                 .build();
         return config;
     }

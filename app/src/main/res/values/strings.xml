@@ -13,5 +13,8 @@
     <string name="no_network">Unable to contact Kickflip</string>
     <string name="no_broadcasts">You don\'t have any broadcasts… yet!</string>
     <string name="stream_flagged">Stream flagged</string>
+    <string name="dialog_title_not_ready">One Sec...</string>
+    <string name="dialog_msg_not_ready">We\'re still registering your Kickflip account. Try again in a few seconds.</string>
+    <string name="dialog_ok">Ok</string>
 
 </resources>
