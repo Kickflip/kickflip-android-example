@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     buildTypes {
         release {
@@ -27,5 +27,5 @@ dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.squareup.picasso:picasso:2.2.0'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    compile 'io.kickflip:sdk:1.0'
+    compile 'io.kickflip:sdk:1.1.1'
 }
