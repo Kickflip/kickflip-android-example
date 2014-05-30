@@ -1,11 +1,8 @@
 package io.kickflip.sample.activity;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
-
-import java.io.File;
 
 import io.kickflip.sample.R;
 import io.kickflip.sample.Util;
@@ -53,7 +50,7 @@ public class CameraActivity extends ImmersiveActivity{
                 }
             }
         });
-        SessionConfig config = Util.create720pSessionConfig(createNewRecordingFile());
+        SessionConfig config = Util.create720pSessionConfig(this);
         if (mRecorder == null) {
             // This null check exists because onCreate may be called in the process of
             // destroying the activity
@@ -74,12 +71,8 @@ public class CameraActivity extends ImmersiveActivity{
         mRecorder.release();
     }
 
-    private String createNewRecordingFile() {
-        return new File(Environment.getExternalStorageDirectory(), String.format("MySampleApp/%d.mp4",System.currentTimeMillis())).getAbsolutePath();
-    }
-
     private void resetAVRecorder() {
-        mRecorder.reset(Util.create720pSessionConfig(createNewRecordingFile()));
+        mRecorder.reset(Util.create720pSessionConfig(this));
     }
 
 }

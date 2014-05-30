@@ -5,14 +5,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
-
-import java.io.File;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
 import io.kickflip.sample.R;
@@ -66,9 +63,6 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
             Log.i(TAG, "onBroadcastError " + error.getMessage());
         }
     };
-    // By default, Kickflip stores video in a "Kickflip" directory on external storage
-    private String mRecordingOutputPath = new File(Environment.getExternalStorageDirectory(), "MySampleApp/index.m3u8").getAbsolutePath();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,8 +172,8 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
 
     private void configureNewBroadcast() {
         // Should reset mRecordingOutputPath between recordings
-        SessionConfig config = Util.create720pSessionConfig(mRecordingOutputPath);
-        //SessionConfig config = Util.create420pSessionConfig(mRecordingOutputPath);
+        SessionConfig config = Util.create720pSessionConfig(this);
+        //SessionConfig config = Util.create420pSessionConfig(this);
         Kickflip.setSessionConfig(config);
     }
 

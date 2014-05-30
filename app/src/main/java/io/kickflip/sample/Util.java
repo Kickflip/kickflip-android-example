@@ -1,8 +1,10 @@
 package io.kickflip.sample;
 
+import android.content.Context;
 import android.os.Build;
 import android.text.format.DateUtils;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,13 +50,19 @@ public class Util {
      * Create a {@link io.kickflip.sdk.av.SessionConfig}
      * corresponding to a 720p video stream
      *
-     * @param outputPath the desired recording output path
+     * @param context the host application Context. Used to access Internal Storage
      * @return the resulting SessionConfig
      */
-    public static SessionConfig create720pSessionConfig(String outputPath) {
+    public static SessionConfig create720pSessionConfig(Context context) {
         HashMap<String, String> extraData = new HashMap<>();
         extraData.put("key", "value");
 
+        String outputPath = new File(context.getFilesDir(), "index.m3u8").getAbsolutePath();
+        // Note SessionConfig actually places each recording in a unique folder
+        // e.g: if you pass /sdcard/test/index.m3u8, your recording will be in
+        //                  /sdcard/test/<some-uuid>/index.m3u8
+        // You can query the actual output file location with SessionConfig#getOutputPath() or the containing directory
+        // with SessionConfig#getOutputDirectory() after construction.
         SessionConfig config = new SessionConfig.Builder(outputPath)
                 .withTitle(Util.getHumanDateString())
                 .withDescription("A live stream!")
@@ -73,10 +81,11 @@ public class Util {
      * Create a {@link io.kickflip.sdk.av.SessionConfig}
      * corresponding to a 420p video stream
      *
-     * @param outputPath the desired recording output path
+     * @param context the host application Context. Used to access Internal Storage
      * @return the resulting SessionConfig
      */
-    public static SessionConfig create420pSessionConfig(String outputPath) {
+    public static SessionConfig create420pSessionConfig(Context context) {
+        String outputPath = new File(context.getFilesDir(), "index.m3u8").getAbsolutePath();
         SessionConfig config = new SessionConfig.Builder(outputPath)
                 .withTitle(Util.getHumanDateString())
                 .withVideoBitrate(1 * 1000 * 1000)
