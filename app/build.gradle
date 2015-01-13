@@ -1,18 +1,18 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:support-v4:21.0.3'
     compile 'com.squareup.picasso:picasso:2.2.0'
     compile project(':submodules:kickflip-android-sdk:sdk')
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
