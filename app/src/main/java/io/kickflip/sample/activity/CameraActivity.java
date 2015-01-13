@@ -1,8 +1,11 @@
 package io.kickflip.sample.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import java.io.IOException;
 
 import io.kickflip.sample.R;
 import io.kickflip.sample.Util;
@@ -54,8 +57,13 @@ public class CameraActivity extends ImmersiveActivity{
         if (mRecorder == null) {
             // This null check exists because onCreate may be called in the process of
             // destroying the activity
-            mRecorder = new AVRecorder(config);
-            mRecorder.setPreviewDisplay((io.kickflip.sdk.view.GLCameraView) findViewById(R.id.cameraPreview));
+            try {
+                mRecorder = new AVRecorder(config);
+                mRecorder.setPreviewDisplay((io.kickflip.sdk.view.GLCameraView) findViewById(R.id.cameraPreview));
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to create AVRecorder. Could be trouble creating MediaCodec encoder.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -68,11 +76,16 @@ public class CameraActivity extends ImmersiveActivity{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mRecorder.release();
+        if (!mRecorder.isRecording()) mRecorder.release();
     }
 
     private void resetAVRecorder() {
-        mRecorder.reset(Util.create720pSessionConfig(this));
+        try {
+            mRecorder.reset(Util.create720pSessionConfig(this));
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to create AVRecorder. Could be trouble creating MediaCodec encoder.");
+            e.printStackTrace();
+        }
     }
 
 }
