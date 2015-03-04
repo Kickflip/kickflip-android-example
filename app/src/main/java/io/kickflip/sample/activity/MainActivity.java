@@ -2,13 +2,16 @@ package io.kickflip.sample.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.amazonaws.util.json.Jackson;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
@@ -21,6 +24,7 @@ import io.kickflip.sdk.Kickflip;
 import io.kickflip.sdk.api.KickflipCallback;
 import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
+import io.kickflip.sdk.api.json.User;
 import io.kickflip.sdk.av.BroadcastListener;
 import io.kickflip.sdk.av.SessionConfig;
 import io.kickflip.sdk.exception.KickflipException;
@@ -69,11 +73,18 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
         getActionBar().setDisplayShowHomeEnabled(false);
         setContentView(R.layout.activity_main);
 
+        final SharedPreferences prefs = getSharedPreferences("app", Context.MODE_PRIVATE);
         // This must happen before any other Kickflip interactions
         Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback() {
             @Override
             public void onSuccess(Response response) {
+                Log.i(TAG, "successfully registered KF app creds");
                 mKickflipReady = true;
+                if ( !prefs.getBoolean("madeuser", false)) {
+                    createUser();
+                } else {
+                    loginUser();
+                }
             }
 
             @Override
@@ -90,6 +101,56 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
             }
         }
         tintStatusBar();
+    }
+
+    private void createUser() {
+        Log.i(TAG, "Creating new KF user...");
+        Kickflip.getApiClient(MainActivity.this).createNewUser("robertscoble", "testPass", "dbro@test.bork", "Nexus 5", null, new KickflipCallback() {
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(TAG, "successfully created new KF user " + ((User) response).getName());
+                getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("madeuser", true).apply();
+            }
+
+            @Override
+            public void onError(KickflipException error) {
+
+            }
+        });
+    }
+
+    private void loginUser() {
+        Log.i(TAG, "Logging in KF user...");
+        Kickflip.getApiClient(MainActivity.this).loginUser("robertscoble", "testPass", new KickflipCallback() {
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(TAG, "successfully logged in KF user " + ((User) response).getName());
+                getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("loggedIn", true).apply();
+                getUserInfo(((User)response).getName());
+            }
+
+            @Override
+            public void onError(KickflipException error) {
+
+            }
+        });
+    }
+
+    private void getUserInfo(String username) {
+        Log.i(TAG, "Getting user info for user " + username);
+        Kickflip.getApiClient(this).getUserInfo(
+                username,
+                new KickflipCallback() {
+                    @Override
+                    public void onSuccess(Response response) {
+                        Log.i(TAG, "user already exists....: " + ((User) response).getDisplayName());
+                    }
+
+                    @Override
+                    public void onError(KickflipException error) {
+                        Log.w(TAG, "User Not found....: " + error.getMessage());
+                    }
+                });
     }
 
     private void tintStatusBar() {

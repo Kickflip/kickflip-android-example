@@ -22,7 +22,9 @@ import io.kickflip.sample.EndlessScrollListener;
 import io.kickflip.sample.LocalPersistence;
 import io.kickflip.sample.R;
 import io.kickflip.sample.SECRETS;
+import io.kickflip.sample.activity.MainActivity;
 import io.kickflip.sample.adapter.StreamAdapter;
+import io.kickflip.sdk.Kickflip;
 import io.kickflip.sdk.Share;
 import io.kickflip.sdk.api.KickflipApiClient;
 import io.kickflip.sdk.api.KickflipCallback;
@@ -237,7 +239,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         if (mKickflip.getActiveUser() == null || mRefreshing) return;
         mRefreshing = true;
         if (refresh) mCurrentPage = 1;
-        mKickflip.getStreamsByKeyword(null, mCurrentPage, ITEMS_PER_PAGE, new KickflipCallback() {
+        mKickflip.getStreamsByUsername(Kickflip.getApiClient(getActivity()).getActiveUser().getName(), mCurrentPage, ITEMS_PER_PAGE, new KickflipCallback() {
             @Override
             public void onSuccess(Response response) {
                 if (VERBOSE) Log.i("API", "request succeeded " + response);

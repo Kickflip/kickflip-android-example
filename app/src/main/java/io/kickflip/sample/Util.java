@@ -65,13 +65,13 @@ public class Util {
         // with SessionConfig#getOutputDirectory() after construction.
         SessionConfig config = new SessionConfig.Builder(outputPath)
                 .withTitle(Util.getHumanDateString())
-                .withDescription("A live stream!")
+                .withDescription("A private live stream!")
                 .withAdaptiveStreaming(true)
                 .withVideoResolution(1280, 720)
                 .withVideoBitrate(2 * 1000 * 1000)
                 .withAudioBitrate(192 * 1000)
                 .withExtraInfo(extraData)
-                .withPrivateVisibility(false)
+                .withPrivateVisibility(true)
                 .withLocation(true)
                 .build();
         return config;
