@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.amazonaws.util.json.Jackson;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
