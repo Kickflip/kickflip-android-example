@@ -2,10 +2,12 @@ package io.kickflip.sample.activity;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import java.io.File;
+import java.io.IOException;
 
 import io.kickflip.sample.R;
 import io.kickflip.sample.Util;
@@ -26,7 +28,10 @@ import io.kickflip.sdk.av.SessionConfig;
  *              display as a result of that ephemeral onCreate. If you do, you'll get a crash as the Camera won't be able to be acquired.
  *              See: http://stackoverflow.com/questions/10498636/prevent-android-activity-from-being-recreated-on-turning-screen-off
  */
-public class CameraActivity extends ImmersiveActivity{
+public class CameraActivity extends ImmersiveActivity {
+
+    private static final String TAG = "CameraActivity";
+
     private AVRecorder mRecorder;
     private Button mRecordingButton;
     private boolean mFirstRecording = true;
@@ -57,8 +62,14 @@ public class CameraActivity extends ImmersiveActivity{
         if (mRecorder == null) {
             // This null check exists because onCreate may be called in the process of
             // destroying the activity
-            mRecorder = new AVRecorder(config);
-            mRecorder.setPreviewDisplay((io.kickflip.sdk.view.GLCameraView) findViewById(R.id.cameraPreview));
+            try {
+                mRecorder = new AVRecorder(config);
+                mRecorder.setPreviewDisplay((io.kickflip.sdk.view.GLCameraView) findViewById(R.id.cameraPreview));
+            } catch (IOException e) {
+                // Could not create recording at given file path
+                Log.e(TAG, "Failed to start AVRecorder!");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -79,7 +90,13 @@ public class CameraActivity extends ImmersiveActivity{
     }
 
     private void resetAVRecorder() {
-        mRecorder.reset(Util.create720pSessionConfig(createNewRecordingFile()));
+        try {
+            mRecorder.reset(Util.create720pSessionConfig(createNewRecordingFile()));
+        } catch (IOException e) {
+            // Could not create recording at given file path
+            Log.e(TAG, "Failed to reset AVRecorder!");
+            e.printStackTrace();
+        }
     }
 
 }

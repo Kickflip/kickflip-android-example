@@ -7,3 +7,4 @@ gradle.properties
 /.idea/
 .DS_Store
 submodules/
+build/
