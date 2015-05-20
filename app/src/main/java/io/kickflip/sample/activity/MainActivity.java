@@ -13,6 +13,8 @@ import android.view.View;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import net.hockeyapp.android.CrashManager;
+
 import java.util.Map;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
@@ -115,6 +117,16 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
                 Log.e(TAG, "Failed to setup kickflip");
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkForCrashes();
+    }
+
+    private void checkForCrashes() {
+        CrashManager.register(this, SECRETS.HOCKEY_ID);
     }
 
     /**
