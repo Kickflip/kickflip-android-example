@@ -59,7 +59,7 @@ public class MainFragment extends Fragment {
                 }
             });
 
-            KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET)
+            KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, true)
             .subscribe(new Action1<KickflipApiClient>() {
                 @Override
                 public void call(KickflipApiClient kickflipApiClient) {

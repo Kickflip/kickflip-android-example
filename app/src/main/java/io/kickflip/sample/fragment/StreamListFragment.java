@@ -125,7 +125,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET)
+        KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, true)
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -211,6 +211,8 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
         setupListViewAdapter();
+        if (mKickflip != null)
+            mAdapter.setUserName(mKickflip.getActiveUser().getName());
         return view;
     }
 

@@ -1,6 +1,5 @@
 package io.kickflip.sample.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,10 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.melnykov.fab.FloatingActionButton;
+
+import java.util.Map;
 
 import io.kickflip.sample.MainFragmentInteractionListener;
 import io.kickflip.sample.R;
@@ -23,7 +24,6 @@ import io.kickflip.sample.fragment.StreamListFragment;
 import io.kickflip.sdk.Kickflip;
 import io.kickflip.sdk.api.KickflipApiClient;
 import io.kickflip.sdk.api.KickflipCallback;
-import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.api.json.User;
 import io.kickflip.sdk.av.BroadcastListener;
@@ -41,6 +41,7 @@ import static io.kickflip.sdk.Kickflip.isKickflipUrl;
 public class MainActivity extends AppCompatActivity implements MainFragmentInteractionListener, StreamListFragment.StreamListFragmenListener {
     private static final String TAG = "MainActivity";
 
+    private FloatingActionButton mFab;
     private boolean mKickflipReady = false;
 
     private BroadcastListener mBroadcastListener = new BroadcastListener() {
@@ -78,24 +79,32 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         setContentView(R.layout.activity_main);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.hide(false);
 
         final SharedPreferences prefs = getSharedPreferences("app", Context.MODE_PRIVATE);
         // This must happen before any other Kickflip interactions
-        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback<KickflipApiClient>() {
+        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, true, new KickflipCallback<KickflipApiClient>() {
             @Override
             public void onSuccess(KickflipApiClient apiClient) {
                 Log.i(TAG, "successfully registered KF app creds");
                 mKickflipReady = true;
+                mFab.show();
+
+                // We passed 'true' to autoCreateUser in Kickflip#setup
+                // but if we wanted to manually create a user with a specified username
+                // we'd do something like below:
+                /*
                 if (!prefs.getBoolean("madeuser", false)) {
                     createUser(apiClient);
                 } else {
                     loginUser(apiClient);
-                }
+                }*/
 
                 if (!handleLaunchingIntent()) {
                     if (savedInstanceState == null) {
                         getFragmentManager().beginTransaction()
-                                .replace(R.id.container, new StreamListFragment())
+                                .replace(R.id.content_fragment, new StreamListFragment())
                                 .commit();
                     }
                 }
@@ -106,10 +115,13 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
                 Log.e(TAG, "Failed to setup kickflip");
             }
         });
-
-        tintStatusBar();
     }
 
+    /**
+     * Demonstrate creating a new Kickflip User with a specified username.
+     * Note that all parameters beside username are mutable after creation
+     * {@link KickflipApiClient#setUserInfo(String, String, String, Map, KickflipCallback)}
+     */
     private void createUser(KickflipApiClient apiClient) {
         Log.i(TAG, "Creating new KF user...");
         apiClient.createNewUser("robertscoble", "testPass", "dbro@test.bork", "Nexus 5", null)
@@ -129,6 +141,12 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
                 });
     }
 
+    /**
+     * Demonstrate logging in an existing user with specified username and password.
+     * You'd use this method to restore a Kickflip user across app installs or
+     * across Kickflip SDKs. e.g: an Android user switches to iOS and wants to
+     * carry over their Kickflip account.
+     */
     private void loginUser(final KickflipApiClient apiClient) {
         Log.i(TAG, "Logging in KF user...");
         apiClient.loginUser("robertscoble", "testPass")
@@ -154,41 +172,21 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
                 });
     }
 
-    private void tintStatusBar() {
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        // enable status bar tint
-        tintManager.setStatusBarTintEnabled(true);
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(false);
-        tintManager.setTintColor(getResources().getColor(R.color.kickflip_green));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_broadcast:
-                if (mKickflipReady) {
-                    startBroadcastingActivity();
-                } else {
-                    new AlertDialog.Builder(this)
-                            .setTitle(getString(R.string.dialog_title_not_ready))
-                            .setMessage(getString(R.string.dialog_msg_not_ready))
-                            .setPositiveButton(getString(R.string.dialog_ok), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                }
-                return true;
+    public void onBroadcastButtonClicked(View v) {
+        // Button shouldn't be visible before Kickflip is ready, but for clarity...
+        if (mKickflipReady)
+            startBroadcastingActivity();
+        else {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.dialog_title_not_ready))
+                    .setMessage(getString(R.string.dialog_msg_not_ready))
+                    .setPositiveButton(getString(R.string.dialog_ok), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -211,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements MainFragmentInter
         configureNewBroadcast();
         Kickflip.setBroadcastListener(mBroadcastListener);
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, BroadcastFragment.getInstance())
+                .replace(R.id.content_fragment, BroadcastFragment.getInstance())
                 .commit();
     }
 
