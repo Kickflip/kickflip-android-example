@@ -150,6 +150,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     public void onStart() {
         super.onStart();
         loadPersistedStreams();
+        getStreams(true);
     }
 
     @Override
@@ -239,8 +240,8 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     /**
      * Fetch Streams and display in ListView
      *
-     * @param refresh whether this fetch is for a subsequent page
-     *                      or to refresh the first page
+     * @param refresh whether this fetch is for a subsequent page (false)
+     *                      or to refresh the first page (true)
      */
     @DebugLog
     private void getStreams(final boolean refresh) {
