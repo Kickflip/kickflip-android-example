@@ -26,7 +26,7 @@ import io.kickflip.sdk.av.SessionConfig;
  *              display as a result of that ephemeral onCreate. If you do, you'll get a crash as the Camera won't be able to be acquired.
  *              See: http://stackoverflow.com/questions/10498636/prevent-android-activity-from-being-recreated-on-turning-screen-off
  */
-public class CameraActivity extends ImmersiveActivity{
+public class CameraActivity extends ImmersiveActivity {
     private AVRecorder mRecorder;
     private Button mRecordingButton;
     private boolean mFirstRecording = true;

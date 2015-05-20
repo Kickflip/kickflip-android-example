@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +38,7 @@ import rx.functions.Func1;
 import static io.kickflip.sdk.Kickflip.isKickflipUrl;
 
 
-public class MainActivity extends Activity implements MainFragmentInteractionListener, StreamListFragment.StreamListFragmenListener {
+public class MainActivity extends AppCompatActivity implements MainFragmentInteractionListener, StreamListFragment.StreamListFragmenListener {
     private static final String TAG = "MainActivity";
 
     private boolean mKickflipReady = false;
@@ -75,7 +76,7 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         setContentView(R.layout.activity_main);
 
         final SharedPreferences prefs = getSharedPreferences("app", Context.MODE_PRIVATE);

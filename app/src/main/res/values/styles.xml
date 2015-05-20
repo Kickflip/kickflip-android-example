@@ -2,20 +2,32 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
         <item name="android:windowBackground">@color/window_bg</item>
+        <!--
         <item name="android:actionBarStyle">@style/KFActionBar</item>
         <item name="android:actionMenuTextColor">@color/kickflip_white</item>
         <item name="android:windowActionBarOverlay">false</item>
+        -->
+
+        <item name="actionBarStyle">@style/KFActionBar</item>
+
+        <item name="colorAccent">@color/kickflip_green_shade_3</item>
+        <item name="colorPrimary">@color/kickflip_green</item>
+        <item name="colorPrimaryDark">@color/kickflip_green_shade_2</item>
+
     </style>
 
-    <style name="KFActionBar" parent="@android:style/Widget.Holo.ActionBar">
+    <style name="KFActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="background">@color/kickflip_green</item>
         <item name="android:background">@color/kickflip_green</item>
+        <item name="titleTextStyle">@style/KFActionBarTitleText</item>
         <item name="android:titleTextStyle">@style/KFActionBarTitleText</item>
     </style>
 
     <!-- ActionBar title text -->
-    <style name="KFActionBarTitleText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    <style name="KFActionBarTitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/kickflip_white</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textStyle">bold</item>
