@@ -17,6 +17,7 @@ import io.kickflip.sample.MainFragmentInteractionListener;
 import io.kickflip.sample.R;
 import io.kickflip.sample.SECRETS;
 import io.kickflip.sdk.api.KickflipApiClient;
+import rx.functions.Action1;
 
 public class MainFragment extends Fragment {
     private static final String TAG = "MainFragment";
@@ -58,7 +59,14 @@ public class MainFragment extends Fragment {
                 }
             });
 
-            mKickflip = new KickflipApiClient(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET);
+            KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET)
+            .subscribe(new Action1<KickflipApiClient>() {
+                @Override
+                public void call(KickflipApiClient kickflipApiClient) {
+                    mKickflip = kickflipApiClient;
+                    // Do some requests
+                }
+            });
 
 //            root.findViewById(R.id.searchUserButton).setOnClickListener(new View.OnClickListener() {
 //                @Override

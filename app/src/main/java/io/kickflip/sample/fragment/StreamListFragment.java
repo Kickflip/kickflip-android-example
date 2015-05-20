@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import hugo.weaving.DebugLog;
 import io.kickflip.sample.EndlessScrollListener;
 import io.kickflip.sample.LocalPersistence;
 import io.kickflip.sample.R;
 import io.kickflip.sample.SECRETS;
-import io.kickflip.sample.activity.MainActivity;
 import io.kickflip.sample.adapter.StreamAdapter;
 import io.kickflip.sdk.Kickflip;
 import io.kickflip.sdk.Share;
@@ -32,6 +32,7 @@ import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
 import io.kickflip.sdk.api.json.StreamList;
 import io.kickflip.sdk.exception.KickflipException;
+import rx.functions.Action1;
 
 /**
  * A fragment representing a list of Items.
@@ -66,11 +67,16 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     private StreamAdapter mAdapter;
 
     private StreamAdapter.StreamAdapterActionListener mStreamActionListener = new StreamAdapter.StreamAdapterActionListener() {
+
         @Override
         public void onFlagButtonClick(final Stream stream) {
-            KickflipCallback cb = new KickflipCallback() {
+
+            // If we don't have the API client available yet, ignore
+            if (mKickflip == null) return;
+
+            KickflipCallback cb = new KickflipCallback<Stream>() {
                 @Override
-                public void onSuccess(Response response) {
+                public void onSuccess(Stream stream) {
                     if (getActivity() != null) {
                         if (mKickflip.activeUserOwnsStream(stream)) {
                             mAdapter.remove(stream);
@@ -119,28 +125,31 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mKickflip = new KickflipApiClient(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback() {
-            @Override
-            public void onSuccess(Response response) {
-                if (mAdapter != null) {
-                    mAdapter.setUserName(mKickflip.getActiveUser().getName());
-                }
-                getStreams(true);
-                // Update profile display when we add that
-            }
+        KickflipApiClient.create(getActivity(), SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET)
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showNetworkError();
+                    }
+                })
+                .subscribe(new Action1<KickflipApiClient>() {
+                    @Override
+                    public void call(KickflipApiClient kickflipApiClient) {
+                        mKickflip = kickflipApiClient;
 
-            @Override
-            public void onError(KickflipException error) {
-                showNetworkError();
-            }
-        });
+                        if (mAdapter != null) {
+                            mAdapter.setUserName(mKickflip.getActiveUser().getName());
+                        }
+                        getStreams(true);
+                        // Update profile display when we add that
+                    }
+                });
     }
 
     @Override
     public void onStart() {
         super.onStart();
         loadPersistedStreams();
-        getStreams(true);
     }
 
     @Override
@@ -169,7 +178,7 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
      * If we had reason to keep a robust local copy of the data, we'd use sqlite
      */
     private void persistStreams() {
-        if (getActivity() != null) {
+        if (getActivity() != null && mStreams != null) {
             while (mStreams.size() > 7) {
                 mStreams.remove(mStreams.size()-1);
             }
@@ -200,7 +209,6 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
-
         setupListViewAdapter();
         return view;
     }
@@ -222,7 +230,6 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         mListener = null;
     }
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Stream stream = mAdapter.getItem(position);
@@ -235,16 +242,17 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
      * @param refresh whether this fetch is for a subsequent page
      *                      or to refresh the first page
      */
+    @DebugLog
     private void getStreams(final boolean refresh) {
-        if (mKickflip.getActiveUser() == null || mRefreshing) return;
+        if (mKickflip == null || mKickflip.getActiveUser() == null || mRefreshing) return;
         mRefreshing = true;
         if (refresh) mCurrentPage = 1;
-        mKickflip.getStreamsByUsername(Kickflip.getApiClient(getActivity()).getActiveUser().getName(), mCurrentPage, ITEMS_PER_PAGE, new KickflipCallback() {
+        mKickflip.getStreamsByUsername(mKickflip.getActiveUser().getName(), mCurrentPage, ITEMS_PER_PAGE, new KickflipCallback<StreamList>() {
             @Override
-            public void onSuccess(Response response) {
-                if (VERBOSE) Log.i("API", "request succeeded " + response);
-                if (getActivity() != null) {
-                    displayStreams(((StreamList) response).getStreams(), !refresh);
+            public void onSuccess(StreamList response) {
+                if (VERBOSE) Log.i("API", "request succeeded. # streams: " + (!response.isSuccessful() ? 0 : response.getStreams().size()));
+                if (getActivity() != null && response.isSuccessful()) {
+                    displayStreams(response.getStreams(), !refresh);
                 }
                 mSwipeLayout.setRefreshing(false);
                 mRefreshing = false;
@@ -269,9 +277,6 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
             mAdapter = new StreamAdapter(getActivity(), mStreams, mStreamActionListener);
             mAdapter.setNotifyOnChange(false);
             mListView.setAdapter(mAdapter);
-            if (mKickflip.getActiveUser() != null) {
-                mAdapter.setUserName(mKickflip.getActiveUser().getName());
-            }
         }
     }
 
@@ -322,16 +327,18 @@ public class StreamListFragment extends Fragment implements AbsListView.OnItemCl
         }
     }
 
+    @DebugLog
     @Override
     public void onRefresh() {
         if (!mRefreshing) {
             getStreams(true);
-        }
+        } else
+            Log.i(TAG, "Already refreshing on refresh request. Ignoring");
 
     }
 
     public interface StreamListFragmenListener {
-        public void onStreamPlaybackRequested(String url);
+        void onStreamPlaybackRequested(String url);
     }
 
 }

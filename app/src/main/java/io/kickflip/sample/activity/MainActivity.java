@@ -20,6 +20,7 @@ import io.kickflip.sample.Util;
 import io.kickflip.sample.fragment.MainFragment;
 import io.kickflip.sample.fragment.StreamListFragment;
 import io.kickflip.sdk.Kickflip;
+import io.kickflip.sdk.api.KickflipApiClient;
 import io.kickflip.sdk.api.KickflipCallback;
 import io.kickflip.sdk.api.json.Response;
 import io.kickflip.sdk.api.json.Stream;
@@ -28,6 +29,10 @@ import io.kickflip.sdk.av.BroadcastListener;
 import io.kickflip.sdk.av.SessionConfig;
 import io.kickflip.sdk.exception.KickflipException;
 import io.kickflip.sdk.fragment.BroadcastFragment;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static io.kickflip.sdk.Kickflip.isKickflipUrl;
 
@@ -66,88 +71,84 @@ public class MainActivity extends Activity implements MainFragmentInteractionLis
             Log.i(TAG, "onBroadcastError " + error.getMessage());
         }
     };
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayShowHomeEnabled(false);
         setContentView(R.layout.activity_main);
 
         final SharedPreferences prefs = getSharedPreferences("app", Context.MODE_PRIVATE);
         // This must happen before any other Kickflip interactions
-        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback() {
+        Kickflip.setup(this, SECRETS.CLIENT_KEY, SECRETS.CLIENT_SECRET, new KickflipCallback<KickflipApiClient>() {
             @Override
-            public void onSuccess(Response response) {
+            public void onSuccess(KickflipApiClient apiClient) {
                 Log.i(TAG, "successfully registered KF app creds");
                 mKickflipReady = true;
-                if ( !prefs.getBoolean("madeuser", false)) {
-                    createUser();
+                if (!prefs.getBoolean("madeuser", false)) {
+                    createUser(apiClient);
                 } else {
-                    loginUser();
+                    loginUser(apiClient);
+                }
+
+                if (!handleLaunchingIntent()) {
+                    if (savedInstanceState == null) {
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.container, new StreamListFragment())
+                                .commit();
+                    }
                 }
             }
 
             @Override
             public void onError(KickflipException error) {
-
+                Log.e(TAG, "Failed to setup kickflip");
             }
         });
 
-        if (!handleLaunchingIntent()) {
-            if (savedInstanceState == null) {
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.container, new StreamListFragment())
-                        .commit();
-            }
-        }
         tintStatusBar();
     }
 
-    private void createUser() {
+    private void createUser(KickflipApiClient apiClient) {
         Log.i(TAG, "Creating new KF user...");
-        Kickflip.getApiClient(MainActivity.this).createNewUser("robertscoble", "testPass", "dbro@test.bork", "Nexus 5", null, new KickflipCallback() {
-            @Override
-            public void onSuccess(Response response) {
-                Log.i(TAG, "successfully created new KF user " + ((User) response).getName());
-                getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("madeuser", true).apply();
-            }
-
-            @Override
-            public void onError(KickflipException error) {
-
-            }
-        });
-    }
-
-    private void loginUser() {
-        Log.i(TAG, "Logging in KF user...");
-        Kickflip.getApiClient(MainActivity.this).loginUser("robertscoble", "testPass", new KickflipCallback() {
-            @Override
-            public void onSuccess(Response response) {
-                Log.i(TAG, "successfully logged in KF user " + ((User) response).getName());
-                getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("loggedIn", true).apply();
-                getUserInfo(((User)response).getName());
-            }
-
-            @Override
-            public void onError(KickflipException error) {
-
-            }
-        });
-    }
-
-    private void getUserInfo(String username) {
-        Log.i(TAG, "Getting user info for user " + username);
-        Kickflip.getApiClient(this).getUserInfo(
-                username,
-                new KickflipCallback() {
+        apiClient.createNewUser("robertscoble", "testPass", "dbro@test.bork", "Nexus 5", null)
+                .doOnError(new Action1<Throwable>() {
                     @Override
-                    public void onSuccess(Response response) {
-                        Log.i(TAG, "user already exists....: " + ((User) response).getDisplayName());
+                    public void call(Throwable throwable) {
+                        // Handle error
                     }
-
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<User>() {
                     @Override
-                    public void onError(KickflipException error) {
-                        Log.w(TAG, "User Not found....: " + error.getMessage());
+                    public void call(User user) {
+                        Log.i(TAG, "successfully created new KF user " + user.getName());
+                        getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("madeuser", true).apply();
+                    }
+                });
+    }
+
+    private void loginUser(final KickflipApiClient apiClient) {
+        Log.i(TAG, "Logging in KF user...");
+        apiClient.loginUser("robertscoble", "testPass")
+                .flatMap(new Func1<User, Observable<User>>() {
+                    @Override
+                    public Observable<User> call(User user) {
+                        return apiClient.getUserInfo(user.getName());
+                    }
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        // Handle error
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        Log.i(TAG, "successfully logged in KF user " + user.getName());
+                        getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("loggedIn", true).apply();
                     }
                 });
     }
